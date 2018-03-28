@@ -19,6 +19,8 @@
 
 #ifndef OPM_TUNING_HPP
 #define OPM_TUNING_HPP
+//#include <string>
+//#include <opm/parser/eclipse/EclipseState/Schedule/DynamicState.hpp>
 
 namespace Opm {
 

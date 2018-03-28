@@ -26,8 +26,10 @@
 #include <opm/parser/eclipse/EclipseState/IOConfig/RestartConfig.hpp>
 #include <opm/parser/eclipse/EclipseState/Runspec.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
-
+#include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
 #include <opm/parser/eclipse/Units/UnitSystem.hpp>
+#include <opm/parser/eclipse/EclipseState/Tables/TableManager.hpp>
+#include <opm/parser/eclipse/EclipseState/Tables/Regdims.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -121,7 +123,7 @@ namespace {
 
         // Not thread-safe (returns pointer to internal, static storage).
         // May wish to add some locking here...
-        const auto timepoint = *std::gmtime(&t);
+        const auto timepoint = *std::localtime(&t);
 
         return {
             timepoint.tm_year + 1900,
@@ -146,7 +148,86 @@ namespace {
 
         return phases;
     }
-} // Anonymous
+
+    Opm::RestartIO::InteHEAD::TuningPar
+    getTuningPars(const ::Opm::Tuning&  tuning, const size_t step)
+    {
+        const auto& newtmx = tuning.getNEWTMX(step);
+	const auto& newtmn = tuning.getNEWTMN(step);
+	const auto& litmax = tuning.getLITMAX(step);
+	const auto& litmin = tuning.getLITMIN(step);
+	const auto& mxwsit = tuning.getMXWSIT(step);
+	const auto& mxwpit = tuning.getMXWPIT(step);
+
+        return {
+            newtmx,
+            newtmn,
+	    litmax,
+	    litmin,
+            mxwsit,
+            mxwpit,
+        };
+    }
+    
+    Opm::RestartIO::InteHEAD::WellSegDims
+    getWellSegDims(const ::Opm::Runspec&  rspec,
+		   const ::Opm::Schedule sched,
+		   const size_t step)
+    {
+        const auto& wsd = rspec.wellSegmentDimensions();
+	const auto& sched_wells = sched.getWells( step );
+	int n_act_seg_wels = 0; 
+	for (const auto& wl : sched_wells)  {
+	  /*if (wl->isMultiSegment(step)) {
+	    std::cout << "sched_well wl: " << wl->name() << std::endl;
+	    n_act_seg_wels += 1;
+	  }
+	  else {
+	    std::cout << "non_sched_well wl: " << wl->name() << std::endl;
+	  }*/
+	    n_act_seg_wels = (wl->isMultiSegment(step))
+	      ? n_act_seg_wels +1 : n_act_seg_wels;
+	}
+
+	const auto nsegwl	= n_act_seg_wels;
+        const auto nswlmx	= wsd.maxSegmentedWells();
+        const auto nsegmx	= wsd.maxSegmentsPerWell();
+        const auto nlbrmx 	= wsd.maxLateralBranchesPerWell();
+	const auto nisegz 	= 22;
+	const auto nrsegz	= 140;
+	const auto nilbrz 	= 10;
+
+        return {
+            nsegwl,
+            nswlmx,
+            nsegmx,
+            nlbrmx,
+	    nisegz,
+	    nrsegz,
+	    nilbrz
+        };
+    }
+    
+    Opm::RestartIO::InteHEAD::RegDims
+    getRegDims(const ::Opm::TableManager tdims,  const ::Opm::Regdims&  rdims)
+    {
+        const auto& ntfip  = tdims.numFIPRegions();
+	const auto& nmfipr = rdims.getNMFIPR();
+	const auto& nrfreg = rdims.getNRFREG();
+	const auto& ntfreg = rdims.getNTFREG();
+	const auto& nplmix = rdims.getNPLMIX();
+
+
+        return {
+            ntfip,
+            nmfipr,
+            nrfreg,
+            ntfreg,
+	    nplmix
+        };
+    }
+} 
+// Anonymous
 
 // #####################################################################
 // Public Interface (createInteHead()) Below Separator
@@ -157,9 +238,12 @@ Opm::RestartIO::Helpers::
 createInteHead(const EclipseState& es,
                const EclipseGrid&  grid,
                const Schedule&     sched,
-               const double        simTime)
+               const double        simTime,
+	       const int report_step)
 {
     const auto& rspec = es.runspec();
+    const auto& tdim = es.getTableManager();
+    const auto& rdim = tdim.getRegdims();
 
     const auto ih = InteHEAD{}
         .dimensions         (grid.getNXYZ())
@@ -169,9 +253,15 @@ createInteHead(const EclipseState& es,
         .calenderDate       (getSimulationDate(sched, simTime))
         .activePhases       (getActivePhases(rspec))
         .params_NWELZ       (155, 122, 130, 3)
-        .params_NCON        (25, 40,58)
+        .params_NCON        (25, 40, 58)
         .params_GRPZ        (getNGRPZ(rspec))
-        .params_NAAQZ       (1, 18, 24, 10, 7, 2, 4);
+        .params_NAAQZ       (1, 18, 24, 10, 7, 2, 4)
+	.stepParam(report_step, report_step)
+	.tuningParam(getTuningPars(sched.getTuning(), report_step))
+	.wellSegDimensions(getWellSegDims(rspec, sched, report_step))
+	.regionDimensions(getRegDims(tdim, rdim))
+	.variousParam(100, 1, 1)
+	;
 
     return ih.data();
 }

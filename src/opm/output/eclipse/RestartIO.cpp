@@ -84,6 +84,7 @@
 #include <opm/parser/eclipse/EclipseState/Grid/EclipseGrid.hpp>
 #include <opm/parser/eclipse/EclipseState/EclipseState.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
+#include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
 
 #include <opm/output/eclipse/libECLRestart.hpp>
 
@@ -545,18 +546,23 @@ void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 */
 
 void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
-		 int report_step,
-		 time_t posix_time,
-		 double sim_days,
-		 int ert_phase_mask,
-		 const UnitSystem& units,
-		 const Schedule& schedule,
-		 const EclipseGrid& grid,
-		 const EclipseState& es  )
+		 int                 report_step,
+		 time_t              posix_time,
+		 double              sim_days,
+		 int                 ert_phase_mask,
+		 const UnitSystem&   units,
+		 const Schedule&     schedule,
+		 const EclipseGrid&  grid,
+		 const EclipseState& es
+		)
 {
-    const auto ih = Helpers::createInteHead(es, grid, schedule, posix_time);
+    const auto ih = Helpers::createInteHead(es, grid, schedule, posix_time, report_step);
 
     write_kw(rst_file, EclKW<int>("INTEHEAD", ih));
+    
+    const auto dh = Helpers::createDoubHead(schedule, report_step, posix_time);
+
+    write_kw(rst_file, EclKW<double>("DOUBHEAD", dh));
 }
 
 
@@ -663,7 +669,8 @@ void save(const std::string& filename,
 	  const EclipseGrid& grid,
 	  const Schedule& schedule,
 	  std::map<std::string, std::vector<double>> extra_data,
-	  bool write_double)
+	  bool write_double
+ 	)
 {
     ::Opm::RestartIO::checkSaveArguments( cells, grid, extra_data );
     {
@@ -681,7 +688,7 @@ void save(const std::string& filename,
 
 
 	cells.convertFromSI( units );
-	::Opm::RestartIO::writeHeader(rst_file.get() , report_step, posix_time , sim_time, ert_phase_mask, units, schedule , grid, es);
+	::Opm::RestartIO::writeHeader(rst_file.get() , report_step, seconds_elapsed , sim_time, ert_phase_mask, units, schedule , grid, es);
 	::Opm::RestartIO::writeWell( rst_file.get() , report_step, es , grid, schedule, wells);
 	::Opm::RestartIO::writeSolution( rst_file.get() , cells , write_double );
 	::Opm::RestartIO::writeExtraData( rst_file.get() , extra_data );

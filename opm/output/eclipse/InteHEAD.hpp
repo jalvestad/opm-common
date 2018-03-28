@@ -39,7 +39,27 @@ namespace Opm { namespace RestartIO {
             int maxWellInGroup;
             int maxGroupInField;
         };
+	
+	struct WellSegDims {
+	    int nsegwl;	
+	    int nswlmx;	
+	    int nsegmx;	
+	    int nlbrmx;	
+	    int nisegz; 	
+	    int nrsegz;
+	    int nilbrz; 	
 
+        };
+
+	struct RegDims {
+	    int ntfip;	
+	    int nmfipr;
+	    int nrfreg;
+	    int ntfreg;
+	    int nplmix;
+
+        };	
+	
         struct Date {
             int year;
             int month;		// 1..12
@@ -56,6 +76,15 @@ namespace Opm { namespace RestartIO {
             int gas;
         };
 
+        struct TuningPar {
+            int newtmx;
+            int newtmn;
+            int litmax;
+            int litmin;
+	    int mxwsit;	
+	    int mxwpit;
+        };
+	
         InteHEAD();
         ~InteHEAD() = default;
 
@@ -77,7 +106,12 @@ namespace Opm { namespace RestartIO {
 	InteHEAD& params_NCON(const int niconz, const int nsconz, const int nxconz);
 	InteHEAD& params_GRPZ(const std::array<int, 4>& grpz);
 	InteHEAD& params_NAAQZ(const int ncamax, const int niaaqz, const int nsaaqz, const int nxaaqz, const int nicaqz, const int nscaqz, const int nacaqz);
-
+	InteHEAD& stepParam(const int tstep, const int repstep);
+	InteHEAD& tuningParam(const TuningPar& tunpar);
+	InteHEAD& variousParam(const int iprog, const int ih101, const int ih103);
+	InteHEAD& wellSegDimensions(const WellSegDims& wsdim);
+	InteHEAD& regionDimensions(const RegDims& rdim);
+	
         const std::vector<int>& data() const
 	{
 	    return this->data_;

@@ -134,6 +134,8 @@ if(ENABLE_ECL_OUTPUT)
           src/opm/test_util/summaryComparator.cpp
           src/opm/test_util/EclFilesComparator.cpp
           src/opm/output/eclipse/CreateInteHead.cpp
+          src/opm/output/eclipse/CreateDoubHead.cpp
+          src/opm/output/eclipse/DoubHEAD.cpp
           src/opm/output/eclipse/EclipseGridInspector.cpp
           src/opm/output/eclipse/EclipseIO.cpp
           src/opm/output/eclipse/LinearisedOutputTable.cpp
@@ -158,6 +160,7 @@ list (APPEND TEST_SOURCE_FILES
       tests/test_SimulationDataContainer.cpp
       tests/test_sparsevector.cpp
       tests/test_uniformtablelinear.cpp
+      tests/test_InteHEAD.cpp
 )
 if(ENABLE_ECL_INPUT)
   list(APPEND TEST_SOURCE_FILES
@@ -464,6 +467,7 @@ if(ENABLE_ECL_OUTPUT)
         opm/output/OutputWriter.hpp
         opm/output/data/Wells.hpp
         opm/output/data/Cells.hpp
+        opm/output/eclipse/DoubHEAD.hpp
         opm/output/eclipse/EclipseGridInspector.hpp
         opm/output/eclipse/EclipseIO.hpp
         opm/output/eclipse/EclipseIOUtil.hpp

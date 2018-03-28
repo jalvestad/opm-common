@@ -29,6 +29,8 @@ namespace Opm {
     class EclipseGrid;
     class EclipseState;
     class Schedule;
+    class Tuning;
+    
 
 } // Opm
 
@@ -38,7 +40,13 @@ namespace Opm { namespace RestartIO { namespace Helpers {
     createInteHead(const EclipseState& es,
                    const EclipseGrid&  grid,
                    const Schedule&     sched,
-                   const double        simTime);
+                   const double        simTime,
+		   const int report_step);
+
+    std::vector<double>
+    createDoubHead(const Schedule&   sched,
+                   const std::size_t rptStep,
+                   const double      simTime);
 
 }}} // Opm::RestartIO::Helpers
 
