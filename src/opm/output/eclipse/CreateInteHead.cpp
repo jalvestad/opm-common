@@ -141,12 +141,12 @@ namespace {
         // calculate the number of hours and mins within respectfully the day and the hour
 
         const auto  hours = (static_cast<int>(simTime / 3600.)) % 24;
-	const auto  mins  = (static_cast<int>(simTime / 60.)) % 60;
+        const auto  mins  = (static_cast<int>(simTime / 60.)) % 60;
 
         return {
             hours,
             mins
-	};
+        };
     }
     
     
@@ -165,83 +165,83 @@ namespace {
     }
 
     Opm::RestartIO::InteHEAD::TuningPar
-    getTuningPars(const ::Opm::Tuning&  tuning, const size_t step)
+    getTuningPars(const ::Opm::Tuning& tuning,
+                  const std::size_t    step)
     {
         const auto& newtmx = tuning.getNEWTMX(step);
-	const auto& newtmn = tuning.getNEWTMN(step);
-	const auto& litmax = tuning.getLITMAX(step);
-	const auto& litmin = tuning.getLITMIN(step);
-	const auto& mxwsit = tuning.getMXWSIT(step);
-	const auto& mxwpit = tuning.getMXWPIT(step);
+        const auto& newtmn = tuning.getNEWTMN(step);
+        const auto& litmax = tuning.getLITMAX(step);
+        const auto& litmin = tuning.getLITMIN(step);
+        const auto& mxwsit = tuning.getMXWSIT(step);
+        const auto& mxwpit = tuning.getMXWPIT(step);
 
         return {
             newtmx,
             newtmn,
-	    litmax,
-	    litmin,
+            litmax,
+            litmin,
             mxwsit,
             mxwpit,
         };
     }
-    
+
     Opm::RestartIO::InteHEAD::WellSegDims
     getWellSegDims(const ::Opm::Runspec&  rspec,
-		   const ::Opm::Schedule& sched,
-		   const size_t step)
+                   const ::Opm::Schedule& sched,
+                   const std::size_t      step)
     {
         const auto& wsd = rspec.wellSegmentDimensions();
-	const auto& sched_wells = sched.getWells( step );
-	const auto n_act_seg_wels =
+        const auto& sched_wells = sched.getWells( step );
+        const auto n_act_seg_wels =
         std::count_if(std::begin(sched_wells), std::end(sched_wells),
-                [step](const Opm::Well* wellPtr)
-            {
-                return wellPtr->isMultiSegment(step);
-            });
-	/*int n_act_seg_wels = 0; 
-	for (const auto& wl : sched_wells)  {
-	    n_act_seg_wels = (wl->isMultiSegment(step))
-	      ? n_act_seg_wels +1 : n_act_seg_wels;
-	}*/
+            [step](const Opm::Well* wellPtr)
+        {
+            return wellPtr->isMultiSegment(step);
+        });
+        /*int n_act_seg_wels = 0; 
+        for (const auto& wl : sched_wells)  {
+            n_act_seg_wels = (wl->isMultiSegment(step))
+              ? n_act_seg_wels +1 : n_act_seg_wels;
+        }*/
 
-	const auto nsegwl	= n_act_seg_wels;
-        const auto nswlmx	= wsd.maxSegmentedWells();
-        const auto nsegmx	= wsd.maxSegmentsPerWell();
-        const auto nlbrmx 	= wsd.maxLateralBranchesPerWell();
-	const auto nisegz 	= 22;
-	const auto nrsegz	= 140;
-	const auto nilbrz 	= 10;
+        const auto nsegwl = n_act_seg_wels;
+        const auto nswlmx = wsd.maxSegmentedWells();
+        const auto nsegmx = wsd.maxSegmentsPerWell();
+        const auto nlbrmx = wsd.maxLateralBranchesPerWell();
+        const auto nisegz = 22;
+        const auto nrsegz = 140;
+        const auto nilbrz = 10;
 
         return {
-            nsegwl,
+            static_cast<int>(nsegwl),
             nswlmx,
             nsegmx,
             nlbrmx,
-	    nisegz,
-	    nrsegz,
-	    nilbrz
+            nisegz,
+            nrsegz,
+            nilbrz
         };
     }
-    
-    Opm::RestartIO::InteHEAD::RegDims
-    getRegDims(const ::Opm::TableManager tdims,  const ::Opm::Regdims&  rdims)
-    {
-        const auto& ntfip  = tdims.numFIPRegions();
-	const auto& nmfipr = rdims.getNMFIPR();
-	const auto& nrfreg = rdims.getNRFREG();
-	const auto& ntfreg = rdims.getNTFREG();
-	const auto& nplmix = rdims.getNPLMIX();
 
+    Opm::RestartIO::InteHEAD::RegDims
+    getRegDims(const ::Opm::TableManager& tdims,
+               const ::Opm::Regdims&      rdims)
+    {
+        const auto ntfip  = tdims.numFIPRegions();
+        const auto nmfipr = rdims.getNMFIPR();
+        const auto nrfreg = rdims.getNRFREG();
+        const auto ntfreg = rdims.getNTFREG();
+        const auto nplmix = rdims.getNPLMIX();
 
         return {
-            ntfip,
-            nmfipr,
-            nrfreg,
-            ntfreg,
-	    nplmix
+            static_cast<int>(ntfip),
+            static_cast<int>(nmfipr),
+            static_cast<int>(nrfreg),
+            static_cast<int>(ntfreg),
+            static_cast<int>(nplmix),
         };
     }
-} 
-// Anonymous
+} // Anonymous
 
 // #####################################################################
 // Public Interface (createInteHead()) Below Separator
@@ -253,11 +253,11 @@ createInteHead(const EclipseState& es,
                const EclipseGrid&  grid,
                const Schedule&     sched,
                const double        simTime,
-	       const int report_step)
+               const int           report_step)
 {
     const auto& rspec = es.runspec();
-    const auto& tdim = es.getTableManager();
-    const auto& rdim = tdim.getRegdims();
+    const auto& tdim  = es.getTableManager();
+    const auto& rdim  = tdim.getRegdims();
 
     const auto ih = InteHEAD{}
         .dimensions         (grid.getNXYZ())
@@ -270,13 +270,13 @@ createInteHead(const EclipseState& es,
         .params_NCON        (25, 40, 58)
         .params_GRPZ        (getNGRPZ(rspec))
         .params_NAAQZ       (1, 18, 24, 10, 7, 2, 4)
-	.stepParam(report_step, report_step)
-	.tuningParam(getTuningPars(sched.getTuning(), report_step))
-	.wellSegDimensions(getWellSegDims(rspec, sched, report_step))
-	.regionDimensions(getRegDims(tdim, rdim))
-	.variousParam(2014, 100, 1, 1)
+        .stepParam(report_step, report_step)
+        .tuningParam(getTuningPars(sched.getTuning(), report_step))
+        .wellSegDimensions(getWellSegDims(rspec, sched, report_step))
+        .regionDimensions(getRegDims(tdim, rdim))
+        .variousParam(2014, 100, 1, 1)
 	.elapsedHoursMins(getSimulationHoursMins(simTime))
-	;
+        ;
 
     return ih.data();
 }

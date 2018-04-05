@@ -30,7 +30,6 @@ namespace Opm {
     class EclipseState;
     class Schedule;
     class Tuning;
-    
 
 } // Opm
 
