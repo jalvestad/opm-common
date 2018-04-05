@@ -19,21 +19,13 @@
 
 #include <opm/output/eclipse/DoubHEAD.hpp>
 
-//#include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
-#include <opm/parser/eclipse/EclipseState/Schedule/ScheduleEnums.hpp>
-#include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
-
-//#include <chrono>
-//#include <cmath>
-//#include <ctime>
-//#include <iterator>
-//#include <numeric>
-//#include <utility>
-//#include <vector>
-
 // Note: DynamicState.hpp and <map> are prerequisites of Tuning.hpp
 #include <opm/parser/eclipse/EclipseState/Schedule/DynamicState.hpp>
+#include <opm/parser/eclipse/EclipseState/Schedule/ScheduleEnums.hpp>
+#include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
+
+
 #include <chrono>
 #include <cmath>
 #include <ctime>
@@ -348,7 +340,7 @@ namespace {
 
     double toDateNum(const std::chrono::time_point<std::chrono::system_clock> tp)
     {
-        const auto t0  = std::chrono::system_clock::to_time_t(tp);
+        const auto t0  =  std::chrono::system_clock::to_time_t(tp);
         const auto tm0 = *std::gmtime(&t0);
 
         // Set clock to 01:00:00+0000 on 1901-<month>-<day> to get
@@ -568,27 +560,6 @@ Opm::RestartIO::DoubHEAD::tuningParameters(const Tuning&     tuning,
 
     return *this;
 }
-/*
-Opm::RestartIO::DoubHEAD&
-Opm::RestartIO::DoubHEAD::timeStamp(const TimeStamp& ts)
-{
-    using day = std::chrono::duration<double,
-        std::ratio_multiply<std::chrono::hours::period,
-                            std::chrono::ratio<24>>
-    >;
-
-    // Elapsed time in days
-    this->data_[Index::SimTime] = std::chrono::
-        duration<day>(ts.elapsed).count();
-
-    // Start time in date-numbers
-    this->data_[Index::Start] = toDateNum(ts.start);
-
-    // Simulation time-stamp in date-numbers
-    this->data_[Index::Time] = this->data_[Index::Start]
-        + this->data_[Index::SimTime];
-}
-*/
 
 Opm::RestartIO::DoubHEAD&
 Opm::RestartIO::DoubHEAD::timeStamp(const TimeStamp& ts)
@@ -610,9 +581,9 @@ Opm::RestartIO::DoubHEAD::timeStamp(const TimeStamp& ts)
     return *this;
 }
 
-
 Opm::RestartIO::DoubHEAD&
-Opm::RestartIO::DoubHEAD::drsdt(const Schedule& sched, const size_t rptStep)
+Opm::RestartIO::DoubHEAD::drsdt(const Schedule&   sched,
+                                const std::size_t rptStep)
 {
   const auto& vappar =
       sched.getOilVaporizationProperties(rptStep);
