@@ -25,6 +25,7 @@
 #include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
 
+#include <opm/output/eclipse/InteHEAD.hpp> // Opm::RestartIO::makeUTCTime()
 
 #include <chrono>
 #include <cmath>
@@ -355,7 +356,7 @@ namespace {
         tm1.tm_sec   = 0;
         tm1.tm_isdst = 0;
 
-        const auto t1 = std::mktime(&tm1);
+        const auto t1 = ::Opm::RestartIO::makeUTCTime(tm1);
 
         if (t1 != static_cast<std::time_t>(-1)) {
             return toDateNum(tm0.tm_year, tm1.tm_yday);
