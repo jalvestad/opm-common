@@ -33,8 +33,8 @@
 #include <opm/parser/eclipse/Units/UnitSystem.hpp>
 
 #include <algorithm>
-#include <chrono>
-#include <ctime>
+#include <exception>
+#include <stdexcept>
 #include <vector>
 
 namespace {
@@ -93,6 +93,11 @@ namespace {
 
         case ::Opm::UnitSystem::UnitType::UNIT_TYPE_PVT_M:
             return US::PVT_M;
+
+        case ::Opm::UnitSystem::UnitType::UNIT_TYPE_INPUT:
+            throw std::invalid_argument {
+                "Cannot Run Simulation With Non-Standard Units"
+            };
         }
 
         return US::Metric;
