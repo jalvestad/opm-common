@@ -17,8 +17,8 @@
   along with OPM.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OPM_INTEHEAD_HEADER_INCLUDED
-#define OPM_INTEHEAD_HEADER_INCLUDED
+#ifndef OPM_DOUBHEAD_HEADER_INCLUDED
+#define OPM_DOUBHEAD_HEADER_INCLUDED
 
 #include <chrono>
 #include <cstddef>
@@ -52,9 +52,10 @@ namespace Opm { namespace RestartIO {
                                    const std::size_t rptStep);
 
         DoubHEAD& timeStamp(const TimeStamp& ts);
-	
-	DoubHEAD& drsdt(const Schedule& sched, const size_t rptStep);
-	
+
+        DoubHEAD& drsdt(const Schedule&   sched,
+                        const std::size_t rptStep);
+
         const std::vector<double>& data() const
         {
             return this->data_;
@@ -66,4 +67,4 @@ namespace Opm { namespace RestartIO {
 
 }} // Opm::RestartIO
 
-#endif
+#endif  // OPM_DOUBHEAD_HEADER_INCLUDED
