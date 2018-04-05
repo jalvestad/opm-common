@@ -42,7 +42,6 @@ namespace {
     getWellTableDims(const ::Opm::Runspec&  rspec,
                      const ::Opm::Schedule& sched)
     {
-        const auto& td = rspec.tabdims();
         const auto& wd = rspec.wellDimensions();
 
         const auto numWells = static_cast<int>(sched.numWells());
