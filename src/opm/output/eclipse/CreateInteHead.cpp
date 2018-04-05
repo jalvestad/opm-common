@@ -27,9 +27,10 @@
 #include <opm/parser/eclipse/EclipseState/Runspec.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Schedule.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/Tuning.hpp>
-#include <opm/parser/eclipse/Units/UnitSystem.hpp>
-#include <opm/parser/eclipse/EclipseState/Tables/TableManager.hpp>
 #include <opm/parser/eclipse/EclipseState/Tables/Regdims.hpp>
+#include <opm/parser/eclipse/EclipseState/Tables/TableManager.hpp>
+
+#include <opm/parser/eclipse/Units/UnitSystem.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -231,12 +232,12 @@ createInteHead(const EclipseState& es,
         .params_NCON        (25, 40, 58)
         .params_GRPZ        (getNGRPZ(rspec))
         .params_NAAQZ       (1, 18, 24, 10, 7, 2, 4)
-        .stepParam(report_step, report_step)
-        .tuningParam(getTuningPars(sched.getTuning(), report_step))
-        .wellSegDimensions(getWellSegDims(rspec, sched, report_step))
-        .regionDimensions(getRegDims(tdim, rdim))
-        .variousParam(2014, 100, 1, 1)
-        .elapsedHoursMins(getSimulationHoursMins(simTime))
+        .stepParam          (report_step, report_step)
+        .tuningParam        (getTuningPars(sched.getTuning(), report_step))
+        .wellSegDimensions  (getWellSegDims(rspec, sched, report_step))
+        .regionDimensions   (getRegDims(tdim, rdim))
+        .variousParam       (2014, 100, 1, 1)
+        .elapsedHoursMins   (getSimulationHoursMins(simTime))
         ;
 
     return ih.data();
