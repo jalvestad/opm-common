@@ -547,8 +547,7 @@ void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 
 void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 		 int                 report_step,
-		 time_t              posix_time,
-		 double              sim_days,
+		 double              simTime,
 		 int                 ert_phase_mask,
 		 const UnitSystem&   units,
 		 const Schedule&     schedule,
@@ -557,7 +556,7 @@ void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 		)
 {
     // write INTEHEAD to restart file
-    const auto ih = Helpers::createInteHead(es, grid, schedule, posix_time, report_step);
+    const auto ih = Helpers::createInteHead(es, grid, schedule, simTime, report_step);
 
     write_kw(rst_file, EclKW<int>("INTEHEAD", ih));
 
@@ -567,7 +566,7 @@ void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
     write_kw(rst_file, EclKW<bool>("LOGIHEAD", lh));
     
     // write DOUBHEAD to restart file
-    const auto dh = Helpers::createDoubHead(schedule, report_step, posix_time);
+    const auto dh = Helpers::createDoubHead(schedule, report_step, simTime);
 
     write_kw(rst_file, EclKW<double>("DOUBHEAD", dh));
 }
@@ -684,8 +683,7 @@ void save(const std::string& filename,
 	int ert_phase_mask = es.runspec().eclPhaseMask( );
 	//const Schedule& schedule = es.getSchedule();
 	const auto& units = es.getUnits();
-	time_t posix_time = schedule.posixStartTime() + seconds_elapsed;
-	const auto sim_time = units.from_si( UnitSystem::measure::time, seconds_elapsed );
+
 	::Opm::RestartIO::ert_unique_ptr< ::Opm::RestartIO::ecl_rst_file_type, ecl_rst_file_close > rst_file;
 
 	if (::Opm::RestartIO::EclFiletype( filename ) == ECL_UNIFIED_RESTART_FILE)
@@ -695,7 +693,7 @@ void save(const std::string& filename,
 
 
 	cells.convertFromSI( units );
-	::Opm::RestartIO::writeHeader(rst_file.get() , report_step, seconds_elapsed , sim_time, ert_phase_mask, units, schedule , grid, es);
+	::Opm::RestartIO::writeHeader(rst_file.get() , report_step, seconds_elapsed, ert_phase_mask, units, schedule , grid, es);
 	::Opm::RestartIO::writeWell( rst_file.get() , report_step, es , grid, schedule, wells);
 	::Opm::RestartIO::writeSolution( rst_file.get() , cells , write_double );
 	::Opm::RestartIO::writeExtraData( rst_file.get() , extra_data );
