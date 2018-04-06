@@ -700,5 +700,4 @@ void save(const std::string& filename,
     }
 }
 
-}
-}
+}} // Opm::RestartIO

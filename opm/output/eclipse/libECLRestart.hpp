@@ -25,13 +25,17 @@
 #ifndef libECLRestart_hpp
 #define libECLRestart_hpp
 
-#include <vector>
-#include <map>
+#include <cassert>
 #include <cstddef>
-#include <time.h>
-#include <ctime>
 #include <cstring>
+#include <ctime>
+#include <map>
 #include <type_traits>
+#include <vector>
+
+#include <stdbool.h>
+#include <time.h>
+
 #include <sys/types.h> 
 #include <sys/stat.h>
 
@@ -295,7 +299,7 @@ typedef enum {
 #else
 //#define UTIL_PATH_SEP_STRING           "/"   /* A \0 terminated separator used when we want a (char *) instance.                   */
 #define UTIL_PATH_SEP_CHAR             '/'   /* A simple character used when we want an actual char instance (i.e. not a pointer). */
-#endif
+#endif // ERT_WINDOWS
 
 
 typedef struct {
@@ -315,8 +319,8 @@ typedef struct stat stat_type;
   typedef off_t offset_type;
 #else
   typedef long offset_type;
-#endif
-#endif
+#endif // HAVE_FSEEKO
+#endif // ERT_WINDOWS_LFS
 
 typedef uint32_t      (hashf_type) (const char *key, size_t len);
 struct ecl_file_struct;
@@ -902,7 +906,7 @@ void ecl_kw_iset_type(::Opm::RestartIO::ecl_kw_type * ecl_kw, ::Opm::RestartIO::
 #define ECL_MESS (::Opm::RestartIO::ecl_data_type) {.type = ECL_MESS_TYPE, .element_size = 0}
 #define ECL_STRING(size) (::Opm::RestartIO::ecl_data_type) {.type = ECL_STRING_TYPE, .element_size = (size) + 1}
 
-#endif
+#endif // __cplusplus
 
 
 #undef util_abort
@@ -911,18 +915,17 @@ void ecl_kw_iset_type(::Opm::RestartIO::ecl_kw_type * ecl_kw, ::Opm::RestartIO::
 #elif __GNUC__
 /* Also clang defines the __GNUC__ symbol */
 #define util_abort(fmt , ...) ::Opm::RestartIO::util_abort__(__FILE__ , __func__ , __LINE__ , fmt , ##__VA_ARGS__)
-#endif
+#endif // _MSC_VER
 
   
 }
 
-#ifndef ERT_ECL_ENDIAN_FLIP_H
-#define ERT_ECL_ENDIAN_FLIP_H
+// #ifndef ERT_ECL_ENDIAN_FLIP_H
+// #define ERT_ECL_ENDIAN_FLIP_H
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif  // __cplusplus
 
-#include <stdbool.h>
 
 /**
    This header file checks if the ECLIPSE endianness and the hardware
@@ -942,22 +945,22 @@ extern "C" {
     #define ECL_ENDIAN_FLIP false
   #else
     #define ECL_ENDIAN_FLIP true
-  #endif
+  #endif  // BYTE_ORDER == ECLIPSE_BYTE_ORDER
 #else
   #ifdef WIN32
     #define ECL_ENDIAN_FLIP true    // Unconditional byte flip on Windows.
   #else
     #error: The macro BYTE_ORDER is not defined?
-  #endif 
-#endif
+  #endif // WIN32
+#endif   // BYTE_ORDER
 
 #undef ECLIPSE_BYTE_ORDER
 
 
 #ifdef __cplusplus
 }
-#endif
-#endif
+#endif // __cplusplus
+//#endif
 
 // For unformatted files:
 #define ECL_BOOL_TRUE_INT         -1   // Binary representation: 11111111  11111111  11111111  1111111
@@ -989,7 +992,7 @@ extern "C" {
 #define UTIL_VA_COPY(target,src) va_copy(target,src)
 #else
 #define UTIL_VA_COPY(target,src) target = src
-#endif
+#endif  // HAVE_VA_COPY
 
 #define UTIL_SAFE_CAST_FUNCTION(type , TYPE_ID)                                          \
 type ## _type * type ## _safe_cast( void * __arg ) {                                     \
@@ -1008,4 +1011,4 @@ type ## _type * type ## _safe_cast( void * __arg ) {                            
    }                                                                                     \
 }
 
-#endif 
+#endif // libECLRestart_hpp
