@@ -139,9 +139,20 @@ BOOST_AUTO_TEST_CASE(CalendarDate)
     BOOST_CHECK_EQUAL(v[66 - 1],    4); // Month
     BOOST_CHECK_EQUAL(v[65 - 1],    9); // Day
 
-    BOOST_CHECK_EQUAL(v[207 - 1], 11); // Hour
-    BOOST_CHECK_EQUAL(v[208 - 1], 22); // Minute
-    BOOST_CHECK_EQUAL(v[412 - 1], 33000000); // Second (in microseconds)
+    BOOST_CHECK_EQUAL(v[411 - 1], 33000000); // Second (in microseconds)
+}
+
+BOOST_AUTO_TEST_CASE(elapsedHoursMins)
+{
+    const auto ih = Opm::RestartIO::InteHEAD{}
+    . elapsedHoursMins({
+            23, 54 
+        });
+    
+    const auto& v = ih.data();
+
+    BOOST_CHECK_EQUAL(v[206], 23); // IHOURZ
+    BOOST_CHECK_EQUAL(v[207], 54); // IMINTS}
 }
 
 BOOST_AUTO_TEST_CASE(ActivePhases)
@@ -307,10 +318,11 @@ BOOST_AUTO_TEST_CASE(Tuning_param)
 BOOST_AUTO_TEST_CASE(Various_Parameters)
 {
     const auto ih = Opm::RestartIO::InteHEAD{}
-        .variousParam(100, 2, 3);
+        .variousParam(2015, 100, 2, 3);
     
     const auto& v = ih.data();
-
+    
+    BOOST_CHECK_EQUAL(v[  1], 2015); // IPROG
     BOOST_CHECK_EQUAL(v[ 94], 100); // IPROG
     BOOST_CHECK_EQUAL(v[101],   2); // IH_101
     BOOST_CHECK_EQUAL(v[103],   3); // IH_103

@@ -556,10 +556,17 @@ void writeHeader(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 		 const EclipseState& es
 		)
 {
+    // write INTEHEAD to restart file
     const auto ih = Helpers::createInteHead(es, grid, schedule, posix_time, report_step);
 
     write_kw(rst_file, EclKW<int>("INTEHEAD", ih));
+
+    // write LOGIHEAD to restart file
+    const auto lh = Helpers::createLogiHead(es);
+
+    write_kw(rst_file, EclKW<bool>("LOGIHEAD", lh));
     
+    // write DOUBHEAD to restart file
     const auto dh = Helpers::createDoubHead(schedule, report_step, posix_time);
 
     write_kw(rst_file, EclKW<double>("DOUBHEAD", dh));

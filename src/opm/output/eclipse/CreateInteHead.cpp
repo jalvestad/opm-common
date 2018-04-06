@@ -135,6 +135,21 @@ namespace {
         };
     }
 
+    Opm::RestartIO::InteHEAD::HoursMins
+    getSimulationHoursMins(const double simTime)
+    {
+        // calculate the number of hours and mins within respectfully the day and the hour
+
+        const auto  hours = (static_cast<int>(simTime / 3600.)) % 24;
+	const auto  mins  = (static_cast<int>(simTime / 60.)) % 60;
+
+        return {
+            hours,
+            mins
+	};
+    }
+    
+    
     Opm::RestartIO::InteHEAD::Phases
     getActivePhases(const ::Opm::Runspec& rspec)
     {
@@ -171,23 +186,22 @@ namespace {
     
     Opm::RestartIO::InteHEAD::WellSegDims
     getWellSegDims(const ::Opm::Runspec&  rspec,
-		   const ::Opm::Schedule sched,
+		   const ::Opm::Schedule& sched,
 		   const size_t step)
     {
         const auto& wsd = rspec.wellSegmentDimensions();
 	const auto& sched_wells = sched.getWells( step );
-	int n_act_seg_wels = 0; 
+	const auto n_act_seg_wels =
+        std::count_if(std::begin(sched_wells), std::end(sched_wells),
+                [step](const Opm::Well* wellPtr)
+            {
+                return wellPtr->isMultiSegment(step);
+            });
+	/*int n_act_seg_wels = 0; 
 	for (const auto& wl : sched_wells)  {
-	  /*if (wl->isMultiSegment(step)) {
-	    std::cout << "sched_well wl: " << wl->name() << std::endl;
-	    n_act_seg_wels += 1;
-	  }
-	  else {
-	    std::cout << "non_sched_well wl: " << wl->name() << std::endl;
-	  }*/
 	    n_act_seg_wels = (wl->isMultiSegment(step))
 	      ? n_act_seg_wels +1 : n_act_seg_wels;
-	}
+	}*/
 
 	const auto nsegwl	= n_act_seg_wels;
         const auto nswlmx	= wsd.maxSegmentedWells();
@@ -260,7 +274,8 @@ createInteHead(const EclipseState& es,
 	.tuningParam(getTuningPars(sched.getTuning(), report_step))
 	.wellSegDimensions(getWellSegDims(rspec, sched, report_step))
 	.regionDimensions(getRegDims(tdim, rdim))
-	.variousParam(100, 1, 1)
+	.variousParam(2014, 100, 1, 1)
+	.elapsedHoursMins(getSimulationHoursMins(simTime))
 	;
 
     return ih.data();

@@ -4,21 +4,21 @@
 #include <vector>
 
 enum index : std::vector<int>::size_type {
-  ISNUM	=	0	,		//	0	0		An encoded integer corresponding to the time the file was created. For files not originating from ECLIPSE, this value may be set to zero.
-  METRIC	=	1	,		//	0	0		
-  UNIT	=	2	,		//	(1,2,3)	1		units type: 1 - METRIC, 2 - FIELD, 3 - LAB
+  ISNUM		=	0	,		//	0	0		An encoded integer corresponding to the time the file was created. For files not originating from ECLIPSE, this value may be set to zero.
+  VERSION	=	1	,		//	0	0		
+  UNIT		=	2	,		//	(1,2,3)	1		units type: 1 - METRIC, 2 - FIELD, 3 - LAB
   ih_003	=	3	,		//	0	0		
   ih_004	=	4	,		//	0	0		
   ih_005	=	5	,		//	0	0		
   ih_006	=	6	,		//	0	0		
   ih_007	=	7	,		//	0	0		
-  NX	=	8	,		//	NX	137		Grid x-direction dimension, NX
-  NY	=	9	,		//	NY	236		Grid x-direction dimension, NY
-  NZ	=	10	,		//	NZ	58		Grid x-direction dimension, NZ
+  NX		=	8	,		//	NX	137		Grid x-direction dimension, NX
+  NY		=	9	,		//	NY	236		Grid x-direction dimension, NY
+  NZ		=	10	,		//	NZ	58		Grid x-direction dimension, NZ
   NACTIV	=	11	,		//	NACTIV?	89022		NACTIV = number of active cells
   ih_012	=	12	,		//	0	0		
   ih_013	=	13	,		//	0	0		
-  PHASE	=	14	,		//	IPHS	7		IPHS = phase indicator: 1 - oil, 2 - water, 3 - oil/water, 4 - gas, 5 – oil/gas, 6 - gas/water, 7 - oil/water/gas (ECLIPSE output only)
+  PHASE		=	14	,		//	IPHS	7		IPHS = phase indicator: 1 - oil, 2 - water, 3 - oil/water, 4 - gas, 5 – oil/gas, 6 - gas/water, 7 - oil/water/gas (ECLIPSE output only)
   ih_015	=	15	,		//	0	0		
   NWELLS	=	16	,		//	NWELLS	39		NWELL = number of wells
   NCWMAX	=	17	,		//	NCWMAX	108	Weldims item2	NCWMAX = maximum number of completions per well
@@ -494,11 +494,17 @@ Opm::RestartIO::InteHEAD::calenderDate(const Date& date)
     this->data_[MONTH] = date.month;
     this->data_[YEAR]  = date.year;
 
-    this->data_[IHOURZ] = date.hour;
-    this->data_[IMINTS] = date.minute;
-
     // Microseonds...
     this->data_[ISECND] = (date.second * 1000) * 1000;
+
+    return *this;
+}
+
+Opm::RestartIO::InteHEAD&
+Opm::RestartIO::InteHEAD::elapsedHoursMins(const HoursMins& hrsmins)
+{
+    this->data_[IHOURZ] = hrsmins.hours;
+    this->data_[IMINTS] = hrsmins.mins;
 
     return *this;
 }
@@ -600,8 +606,9 @@ Opm::RestartIO::InteHEAD::tuningParam(const TuningPar& tunpar)
 
 
 Opm::RestartIO::InteHEAD&
-Opm::RestartIO::InteHEAD::variousParam(const int iprog, const int ih101, const int ih103)
+Opm::RestartIO::InteHEAD::variousParam(const int version, const int iprog, const int ih101, const int ih103)
 {
+    this->data_[VERSION]  = version;
     this->data_[IPROG]  = iprog;
     this->data_[ih_101] = ih101;
     this->data_[ih_103] = ih103;

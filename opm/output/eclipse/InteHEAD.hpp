@@ -69,6 +69,11 @@ namespace Opm { namespace RestartIO {
             int minute;		// 0..59
             int second;		// 0..59
         };
+	
+	struct HoursMins {
+            int hours;
+            int mins;	
+        };
 
         struct Phases {
             int oil;
@@ -108,9 +113,10 @@ namespace Opm { namespace RestartIO {
 	InteHEAD& params_NAAQZ(const int ncamax, const int niaaqz, const int nsaaqz, const int nxaaqz, const int nicaqz, const int nscaqz, const int nacaqz);
 	InteHEAD& stepParam(const int tstep, const int repstep);
 	InteHEAD& tuningParam(const TuningPar& tunpar);
-	InteHEAD& variousParam(const int iprog, const int ih101, const int ih103);
+	InteHEAD& variousParam(const int version, const int iprog, const int ih101, const int ih103);
 	InteHEAD& wellSegDimensions(const WellSegDims& wsdim);
 	InteHEAD& regionDimensions(const RegDims& rdim);
+	InteHEAD& elapsedHoursMins(const HoursMins& hrsmins);
 	
         const std::vector<int>& data() const
 	{
