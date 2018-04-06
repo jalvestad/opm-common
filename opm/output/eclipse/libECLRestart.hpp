@@ -766,6 +766,8 @@ inline const char* EclKW_ref< const char* >::at( size_t i ) const {
 template<>
 const char*& EclKW_ref< const char* >::operator[]( size_t i )  = delete;
 
+template <typename T> class EclKW;       // Generic
+template <>           class EclKW<bool>; // Specialisation for bool
 
 template< typename T >
 class EclKW : public ::Opm::RestartIO::EclKW_ref< T > {
@@ -823,6 +825,82 @@ EclKW< const char* >::EclKW( const std::string& kw,
     for( size_t i = 0; i < data.size(); ++i )
         ::Opm::RestartIO::ecl_kw_iset_string8( ptr, i, data[ i ] );
 }
+
+/// Specialisation of class EclKW<T> for T==bool.
+///
+/// Mainly for outputting a \code std::vector<bool> \endcode as a keyword to
+/// a restart or summary file (e.g., keyword LOGIHEAD).
+template <>
+class EclKW<bool>
+{
+public:
+    explicit EclKW(const std::string& kw, const std::vector<bool>& data)
+        : m_kw(::Opm::RestartIO::ecl_kw_alloc(kw.c_str(), data.size(), ECL_BOOL))
+    {
+        if (m_kw != nullptr) {
+            const auto n = static_cast<int>(data.size());
+
+            for (auto i = 0*n; i < n; ++i) {
+                ::Opm::RestartIO::ecl_kw_iset_bool(this->m_kw, i, data[i]);
+            }
+        }
+    }
+
+    EclKW(const EclKW& rhs)
+        : m_kw(::Opm::RestartIO::ecl_kw_alloc_copy(rhs.m_kw))
+    {
+    }
+
+    EclKW(EclKW&& rhs)
+        : m_kw(rhs.m_kw)
+    {
+        rhs.m_kw = nullptr;
+    }
+
+    EclKW& operator=(const EclKW& rhs)
+    {
+        if (rhs.m_kw != this->m_kw) {
+            return *this;       // Self assignment (nothing to do)
+        }
+
+        this->clear();
+
+        this->m_kw = ::Opm::RestartIO::ecl_kw_alloc_copy(rhs.m_kw);
+
+        return *this;
+    }
+
+    EclKW& operator=(EclKW&& rhs)
+    {
+        assert (this != &rhs);  // kw = move(kw) is bug in the caller...
+
+        this->m_kw = rhs.m_kw;
+        rhs.m_kw = nullptr;
+
+        return *this;
+    }
+
+    ~EclKW()
+    {
+        this->clear();
+    }
+
+    const ::Opm::RestartIO::ecl_kw_type* get() const {
+        return this->m_kw;
+    }
+
+private:
+    ::Opm::RestartIO::ecl_kw_type* m_kw = nullptr;
+
+    void clear()
+    {
+        if (this->m_kw != nullptr) { // kw_free(nullptr) is undefined
+            ::Opm::RestartIO::ecl_kw_free(this->m_kw);
+        }
+
+        this->m_kw = nullptr;
+    }
+};
 
 template <typename T , void (*F)(T*)>
 struct deleter
