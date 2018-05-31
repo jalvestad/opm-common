@@ -362,7 +362,7 @@ RestartValue first_sim(const EclipseState& es, EclipseIO& eclWriter, bool write_
                              false,
                              first_step - start_time,
                              restart_value,
-                             {}, {}, {}, write_double);
+			     {}, {}, {}, write_double);
 
     return restart_value;
 }
@@ -482,12 +482,14 @@ BOOST_AUTO_TEST_CASE(WriteWrongSOlutionSize) {
         auto num_cells = setup.grid.getNumActive( ) + 1;
         auto cells = mkSolution( num_cells );
         auto wells = mkWells();
+	Opm::SummaryState sumState;
 
         BOOST_CHECK_THROW( RestartIO::save("FILE.UNRST", 1 ,
                                            100,
                                            RestartValue(cells, wells),
                                            setup.es,
                                            setup.grid ,
+					   sumState,
                                            setup.schedule),
                                            std::runtime_error);
     }
@@ -525,13 +527,14 @@ BOOST_AUTO_TEST_CASE(ExtraData_content) {
         const auto& units = setup.es.getUnits();
         {
             RestartValue restart_value(cells, wells);
-
+	    Opm::SummaryState sumState;
             restart_value.addExtra("EXTRA", UnitSystem::measure::pressure, {10,1,2,3});
             RestartIO::save("FILE.UNRST", 1 ,
                             100,
                             restart_value,
                             setup.es,
                             setup.grid,
+			    sumState,
                             setup.schedule);
 
             {
@@ -598,12 +601,14 @@ BOOST_AUTO_TEST_CASE(STORE_THPRES) {
             */
 
             restart_value.addExtra("THRESHPR", UnitSystem::measure::pressure, {0,1});
+	    Opm::SummaryState sumState;
             /* THPRES data has wrong size in extra container. */
             BOOST_CHECK_THROW( RestartIO::save("FILE.UNRST", 1 ,
                                                100,
                                                restart_value,
                                                setup.es,
                                                setup.grid,
+					       sumState,
                                                setup.schedule), std::runtime_error);
 
             int num_regions = setup.es.getTableManager().getEqldims().getNumEquilRegions();
