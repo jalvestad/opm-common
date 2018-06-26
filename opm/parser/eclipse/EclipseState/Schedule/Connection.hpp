@@ -22,14 +22,15 @@
 #define COMPLETION_HPP_
 
 #include <array>
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <opm/parser/eclipse/Parser/ParseContext.hpp>
 #include <opm/parser/eclipse/EclipseState/Schedule/ScheduleEnums.hpp>
 #include <opm/parser/eclipse/EclipseState/Util/Value.hpp>
-
 
 namespace Opm {
 
@@ -49,7 +50,6 @@ namespace Opm {
                    const int satTableId,
                    const WellCompletion::DirectionEnum direction);
 
-
         bool sameCoordinate(const int i, const int j, const int k) const;
         int getI() const;
         int getJ() const;
@@ -57,7 +57,7 @@ namespace Opm {
         double getConnectionTransmissibilityFactor() const;
         double getDiameter() const;
         double getSkinFactor() const;
-        bool attachedToSegment() const;
+        bool   attachedToSegment() const;
         const Value<double>& getConnectionTransmissibilityFactorAsValueObject() const;
         const Value<double>& getEffectiveKhAsValueObject() const;
 
@@ -82,9 +82,11 @@ namespace Opm {
         // -1 means the completion is not related to segment
         int segment_number = -1;
         double wellPi = 1.0;
+
+        std::size_t seqIndex;
+        double compSegStartLength;
+        double compSegEndLength;
     };
 }
-
-
 
 #endif /* COMPLETION_HPP_ */

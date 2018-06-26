@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <cassert>
 #include <vector>
-#include <iostream>
 
 #include <opm/parser/eclipse/Deck/DeckItem.hpp>
 #include <opm/parser/eclipse/Deck/DeckKeyword.hpp>
@@ -58,6 +57,15 @@ namespace Opm {
           m_Kh(Kh)
     {}
 
+    bool Connection::sameCoordinate(const Connection& other) const {
+        if ((m_i == other.m_i) &&
+            (m_j == other.m_j) &&
+            (m_k == other.m_k))
+            return true;
+        else
+            return false;
+    }
+
     bool Connection::sameCoordinate(const int i, const int j, const int k) const {
         if ((ijk[0] == i) && (ijk[1] == j) && (ijk[2] == k)) {
             return true;
@@ -93,7 +101,6 @@ namespace Opm {
         return m_skinFactor.getValue();
     }
 
-
     const Value<double>& Connection::getConnectionTransmissibilityFactorAsValueObject() const {
         return m_connectionTransmissibilityFactor;
     }
@@ -117,12 +124,13 @@ namespace Opm {
             && this->state == rhs.state
             && this->dir == rhs.dir
             && this->segment_number == rhs.segment_number
-            && this->center_depth == rhs.center_depth;
+            && this->center_depth == rhs.center_depth
+            && this->seqIndex == rhs.seqIndex
+            && this->compSegStartLength == rhs.compSegStartLength
+            && this->compSegEndLength == rhs.compSegEndLength;
     }
 
     bool Connection::operator!=( const Connection& rhs ) const {
         return !( *this == rhs );
     }
 }
-
-
