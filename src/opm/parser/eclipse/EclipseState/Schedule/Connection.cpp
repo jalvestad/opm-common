@@ -125,9 +125,7 @@ namespace Opm {
             && this->dir == rhs.dir
             && this->segment_number == rhs.segment_number
             && this->center_depth == rhs.center_depth
-            && this->seqIndex == rhs.seqIndex
-            && this->compSegStartLength == rhs.compSegStartLength
-            && this->compSegEndLength == rhs.compSegEndLength;
+            && this->seqIndex == rhs.seqIndex;
     }
 
     bool Connection::operator!=( const Connection& rhs ) const {

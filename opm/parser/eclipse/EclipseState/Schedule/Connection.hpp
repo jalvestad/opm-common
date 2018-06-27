@@ -84,8 +84,6 @@ namespace Opm {
         double wellPi = 1.0;
 
         std::size_t seqIndex;
-        double compSegStartLength;
-        double compSegEndLength;
     };
 }
 
