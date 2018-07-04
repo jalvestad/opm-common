@@ -57,14 +57,14 @@ namespace Opm {
           m_Kh(Kh)
     {}
 
-    bool Connection::sameCoordinate(const Connection& other) const {
+    /*bool Connection::sameCoordinate(const Connection& other) const {
         if ((m_i == other.m_i) &&
             (m_j == other.m_j) &&
             (m_k == other.m_k))
             return true;
         else
             return false;
-    }
+    }*/
 
     bool Connection::sameCoordinate(const int i, const int j, const int k) const {
         if ((ijk[0] == i) && (ijk[1] == j) && (ijk[2] == k)) {
