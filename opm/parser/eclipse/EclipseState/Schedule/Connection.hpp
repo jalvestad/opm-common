@@ -48,7 +48,8 @@ namespace Opm {
                    const Value<double>& skinFactor,
                    const Value<double>& Kh,
                    const int satTableId,
-                   const WellCompletion::DirectionEnum direction);
+                   const WellCompletion::DirectionEnum direction,
+		   const std::size_t seqIndex);
 
         bool sameCoordinate(const int i, const int j, const int k) const;
         int getI() const;
@@ -60,6 +61,8 @@ namespace Opm {
         bool   attachedToSegment() const;
         const Value<double>& getConnectionTransmissibilityFactorAsValueObject() const;
         const Value<double>& getEffectiveKhAsValueObject() const;
+	const std::size_t& getSeqIndex() const;
+	void setSeqIndex(std::size_t index);
 
         bool operator==( const Connection& ) const;
         bool operator!=( const Connection& ) const;
@@ -72,6 +75,7 @@ namespace Opm {
 
     private:
         std::array<int,3> ijk;
+	std::size_t m_seqIndex;
         Value<double> m_diameter;
         Value<double> m_connectionTransmissibilityFactor;
         Value<double> m_skinFactor;
@@ -82,8 +86,6 @@ namespace Opm {
         // -1 means the completion is not related to segment
         int segment_number = -1;
         double wellPi = 1.0;
-
-        std::size_t seqIndex;
     };
 }
 

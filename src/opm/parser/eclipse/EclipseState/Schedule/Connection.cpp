@@ -44,7 +44,8 @@ namespace Opm {
                            const Value<double>& skinFactor,
                            const Value<double>& Kh,
                            const int satTableId,
-                           const WellCompletion::DirectionEnum direction)
+                           const WellCompletion::DirectionEnum direction,
+			   const std::size_t seqIndex)
         : dir(direction),
           center_depth(depth),
           state(stateArg),
@@ -54,7 +55,8 @@ namespace Opm {
           m_diameter(diameter),
           m_connectionTransmissibilityFactor(connectionTransmissibilityFactor),
           m_skinFactor(skinFactor),
-          m_Kh(Kh)
+          m_Kh(Kh),
+          m_seqIndex(seqIndex)
     {}
 
     /*bool Connection::sameCoordinate(const Connection& other) const {
@@ -87,7 +89,14 @@ namespace Opm {
     int Connection::getK() const {
         return ijk[2];
     }
-
+    
+    const std::size_t& Connection::getSeqIndex() const {
+        return m_seqIndex;
+    }
+    
+    void Connection::setSeqIndex(std::size_t index) {
+        m_seqIndex = index;
+    }
 
     double Connection::getConnectionTransmissibilityFactor() const {
         return m_connectionTransmissibilityFactor.getValue();
@@ -125,7 +134,7 @@ namespace Opm {
             && this->dir == rhs.dir
             && this->segment_number == rhs.segment_number
             && this->center_depth == rhs.center_depth
-            && this->seqIndex == rhs.seqIndex;
+            && this->m_seqIndex == rhs.m_seqIndex;
     }
 
     bool Connection::operator!=( const Connection& rhs ) const {
