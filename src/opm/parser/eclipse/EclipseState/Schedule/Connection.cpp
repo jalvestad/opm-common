@@ -45,7 +45,10 @@ namespace Opm {
                            const Value<double>& Kh,
                            const int satTableId,
                            const WellCompletion::DirectionEnum direction,
-			   const std::size_t seqIndex)
+			   const std::size_t seqIndex,
+			   const double segDistStart,
+			   const double segDistEnd
+			  )
         : dir(direction),
           center_depth(depth),
           state(stateArg),
@@ -56,7 +59,9 @@ namespace Opm {
           m_connectionTransmissibilityFactor(connectionTransmissibilityFactor),
           m_skinFactor(skinFactor),
           m_Kh(Kh),
-          m_seqIndex(seqIndex)
+          m_seqIndex(seqIndex),
+          m_segDistStart(segDistStart),
+          m_segDistEnd(segDistEnd)
     {}
 
     /*bool Connection::sameCoordinate(const Connection& other) const {
@@ -94,10 +99,31 @@ namespace Opm {
         return m_seqIndex;
     }
     
-    void Connection::setSeqIndex(std::size_t index) {
-        m_seqIndex = index;
+    const std::size_t& Connection::getCompSegSeqIndex() const {
+        return m_compSeg_seqIndex;
     }
 
+    const double& Connection::getSegDistStart() const {
+        return m_segDistStart;
+    }
+
+    const double& Connection::getSegDistEnd() const {
+        return m_segDistEnd;
+    }
+
+    
+    void Connection::setCompSegSeqIndex(std::size_t index) {
+        m_compSeg_seqIndex = index;
+    }
+    
+    void Connection::setSegDistStart(const double& distStart) {
+        m_segDistStart = distStart;
+    }
+
+    void Connection::setSegDistEnd(const double& distEnd) {
+        m_segDistEnd = distEnd;
+    }
+    
     double Connection::getConnectionTransmissibilityFactor() const {
         return m_connectionTransmissibilityFactor.getValue();
     }

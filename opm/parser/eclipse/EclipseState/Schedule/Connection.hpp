@@ -49,7 +49,10 @@ namespace Opm {
                    const Value<double>& Kh,
                    const int satTableId,
                    const WellCompletion::DirectionEnum direction,
-		   const std::size_t seqIndex);
+		   const std::size_t seqIndex,
+		   const double segDistStart,
+		   const double segDistEnd
+		  );
 
         bool sameCoordinate(const int i, const int j, const int k) const;
         int getI() const;
@@ -62,7 +65,12 @@ namespace Opm {
         const Value<double>& getConnectionTransmissibilityFactorAsValueObject() const;
         const Value<double>& getEffectiveKhAsValueObject() const;
 	const std::size_t& getSeqIndex() const;
-	void setSeqIndex(std::size_t index);
+	const std::size_t& getCompSegSeqIndex() const;
+	void setCompSegSeqIndex(std::size_t index);
+	const double& getSegDistStart() const;
+	const double& getSegDistEnd() const;
+	void setSegDistStart(const double& distStart);
+	void setSegDistEnd(const double& distEnd);
 
         bool operator==( const Connection& ) const;
         bool operator!=( const Connection& ) const;
@@ -76,10 +84,13 @@ namespace Opm {
     private:
         std::array<int,3> ijk;
 	std::size_t m_seqIndex;
+	std::size_t m_compSeg_seqIndex=0;
         Value<double> m_diameter;
         Value<double> m_connectionTransmissibilityFactor;
         Value<double> m_skinFactor;
         Value<double> m_Kh;
+	double m_segDistStart;
+	double m_segDistEnd;
 
     public:
         // related segment number

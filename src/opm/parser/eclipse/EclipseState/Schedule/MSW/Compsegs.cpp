@@ -246,7 +246,10 @@ namespace Opm {
 
             connection.segment_number = compseg.segment_number;
             connection.center_depth   = compseg.center_depth;
-            connection.setSeqIndex(compseg.m_seqIndex);
+	    //keep connection sequence number from input sequence
+            connection.setCompSegSeqIndex(compseg.m_seqIndex);
+	    connection.setSegDistStart(compseg.m_distance_start);
+	    connection.setSegDistEnd(compseg.m_distance_end);
         }
 
         for (size_t ic = 0; ic < connection_set.size(); ++ic) {
