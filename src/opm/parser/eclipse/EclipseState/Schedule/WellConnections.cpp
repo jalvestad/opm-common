@@ -102,7 +102,7 @@ namespace Opm {
 			    defaultSatTabId);
     }
 
-    void WellConnections::loadCOMPDAT(const DeckRecord& record, const EclipseGrid& grid, const Eclipse3DProperties& eclipseProperties) {
+    void WellConnections::loadCOMPDAT(const DeckRecord& record, const EclipseGrid& grid, const Eclipse3DProperties& eclipseProperties, std::size_t& totNC) {
         const auto& itemI = record.getItem( "I" );
         const auto defaulted_I = itemI.defaultApplied( 0 ) || itemI.get< int >( 0 ) == 0;
         const int I = !defaulted_I ? itemI.get< int >( 0 ) - 1 : this->headI;
@@ -164,7 +164,7 @@ namespace Opm {
             if (grid.cellActive(I, J, k)) {
 		if (prev == this->m_connections.end()) {
 		    std::size_t noConn = this->m_connections.size();
-		    std::cout << "WellConnections - WC - prev-end, I: " << I << " J: " << J << " k: " << k << " noConn: " << noConn << std::endl;
+		    totNC = noConn;
 		    this->addConnection(I,J,k,
 					grid.getCellDepth( I,J,k ),
 					state,
@@ -178,7 +178,6 @@ namespace Opm {
 		} 
 		else {
 		    std::size_t noConn = prev->getSeqIndex();
-		    std::cout << "WellConnections - WC - prev-exist, I: " << I << " J: " << J << " k: " << k << " noConn: " << noConn << std::endl;
 		    // The complnum value carries over; the rest of the state is fully specified by
 		    // the current COMPDAT keyword.
 		    int complnum = prev->complnum;

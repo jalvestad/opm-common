@@ -88,8 +88,8 @@ Opm::EclipseGrid grid(20,20,20);
     segment_set.loadWELSEGS(welsegs);
 
     BOOST_CHECK_EQUAL(6U, segment_set.size());
-
-    const Opm::WellConnections * new_connection_set = Opm::newConnectionsWithSegments(compsegs, connection_set, segment_set, grid);
+    std::size_t totNC = 0;
+    const Opm::WellConnections * new_connection_set = Opm::newConnectionsWithSegments(compsegs, connection_set, segment_set, grid, totNC);
 
     BOOST_CHECK_EQUAL(7U, new_connection_set->size());
 

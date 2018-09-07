@@ -525,7 +525,6 @@ void writeGroup(::Opm::RestartIO::ecl_rst_file_type * rst_file,
 		 const std::vector<int>&  ih)
 {
     // write IGRP to restart file
-    //std::cout << "writeGroup before initializing groupData" << std::endl;
     const size_t simStep = static_cast<size_t> (sim_step);
 
     auto  groupData = Helpers::AggregateGroupData(ih);
@@ -569,6 +568,7 @@ void writeGroup(::Opm::RestartIO::ecl_rst_file_type * rst_file,
   void writeSolution(ecl_rst_file_type* rst_file, const RestartValue& value, bool write_double) {
       ecl_rst_file_start_solution( rst_file );
       for (const auto& elm: value.solution) {
+	  if (elm.first == "TEMP") continue;
           if (elm.second.target == data::TargetType::RESTART_SOLUTION)
               ecl_rst_file_add_kw( rst_file , ecl_kw(elm.first, elm.second.data, write_double).get());
       }
@@ -584,39 +584,13 @@ void writeGroup(::Opm::RestartIO::ecl_rst_file_type * rst_file,
       ecl_rst_file_end_solution( rst_file );
 
       for (const auto& elm: value.solution) {
+	  if (elm.first == "TEMP") continue;
           if (elm.second.target == data::TargetType::RESTART_AUXILIARY)
               ecl_rst_file_add_kw( rst_file , ecl_kw(elm.first, elm.second.data, write_double).get());
       }
   }
       
       
-      //  temporarily comment out jals original version
-      /*void writeSolution(::Opm::RestartIO::ecl_rst_file_type* rst_file, const data::Solution& solution, bool write_double) {
-     void writeSolution(::Opm::RestartIO::ecl_rst_file_type* rst_file, const data::Solution& solution, bool write_double) {
-    void writeSolution(::Opm::RestartIO::ecl_rst_file_type* rst_file, const data::Solution& solution, const RestartValue::ExtraVector& extra_data, bool write_double) {
-    ::Opm::RestartIO::ecl_rst_file_start_solution( rst_file );
-    for (const auto& elm: solution) {
-	if (elm.first == "TEMP") continue;
-	if (elm.second.target == data::TargetType::RESTART_SOLUTION)
-	    ::Opm::RestartIO::ecl_rst_file_add_kw( rst_file , ecl_kw(elm.first, elm.second.data, write_double).get());
-     }
-     
-     for (const auto& extra_value : extra_data) {
-	const std::string& key = extra_value.first.key;
-	const std::vector<double>& data = extra_value.second;
-	if ( key == "THRESHPR") 
-	{
-	     ::Opm::RestartIO::ecl_rst_file_add_kw( rst_file , ecl_kw(key, data, write_double).get());
-	}
-     }	
-     ::Opm::RestartIO::ecl_rst_file_end_solution( rst_file );
-
-     for (const auto& elm: solution) {
-	if (elm.second.target == data::TargetType::RESTART_AUXILIARY)
-	    ::Opm::RestartIO::ecl_rst_file_add_kw( rst_file , ecl_kw(elm.first, elm.second.data, write_double).get());
-     }
-  } */
-
 
   void writeExtraData(::Opm::RestartIO::ecl_rst_file_type* rst_file, const RestartValue::ExtraVector& extra_data) {
     for (const auto& extra_value : extra_data) {
@@ -628,15 +602,6 @@ void writeGroup(::Opm::RestartIO::ecl_rst_file_type * rst_file,
             ecl_kw_free( ecl_kw );
         }
 
-	  /*const std::string& key = extra_value.first;
-	const std::string& key = extra_value.first.key;
-	const std::vector<double>& data = extra_value.second;
-	if (key != "THRESHPR")
-	{
-	    ::Opm::RestartIO::ecl_kw_type * ecl_kw = ::Opm::RestartIO::ecl_kw_alloc_new_shared( key.c_str() , data.size() , ECL_DOUBLE , const_cast<double *>(data.data()));
-	    ::Opm::RestartIO::ecl_rst_file_add_kw( rst_file , ecl_kw);
-	    ::Opm::RestartIO::ecl_kw_free( ecl_kw );
-	}*/
     }
 }
 
@@ -707,31 +672,6 @@ void save(const std::string&  filename,
 {
     ::Opm::RestartIO::checkSaveArguments(es, value, grid);
     {
-	/* int sim_step = std::max(report_step - 1, 0);
-        int ert_phase_mask = es.runspec().eclPhaseMask( );
-        const auto& units = es.getUnits();
-        time_t posix_time = schedule.posixStartTime() + seconds_elapsed;
-        const auto sim_time = units.from_si( UnitSystem::measure::time, seconds_elapsed );
-        ERT::ert_unique_ptr< ecl_rst_file_type, ecl_rst_file_close > rst_file;
-
-        if (ERT::EclFiletype( filename ) == ECL_UNIFIED_RESTART_FILE)
-            rst_file.reset( ecl_rst_file_open_write_seek( filename.c_str(), report_step ) );
-        else
-            rst_file.reset( ecl_rst_file_open_write( filename.c_str() ) );
-
-        // Convert solution fields and extra values from SI to user units.
-        value.solution.convertFromSI(units);
-        for (auto & extra_value : value.extra) {
-            const auto& restart_key = extra_value.first;
-            auto & data = extra_value.second;
-
-            units.from_si(restart_key.dim, data);
-        }
-
-        writeHeader( rst_file.get(), sim_step, report_step, posix_time , sim_time, ert_phase_mask, units, schedule , grid );
-        writeWell( rst_file.get(), sim_step, es , grid, schedule, value.wells);
-        writeSolution( rst_file.get(), value, write_double );
-        writeExtraData( rst_file.get(), value.extra );*/
 
 	int sim_step = std::max(report_step - 1, 0);
 	int ert_phase_mask = es.runspec().eclPhaseMask( );
@@ -759,7 +699,7 @@ void save(const std::string&  filename,
 	::Opm::RestartIO::writeMSWData(rst_file.get() , sim_step, seconds_elapsed, ert_phase_mask, units, schedule, grid, es, sumState, inteHD);
 	::Opm::RestartIO::writeWell( rst_file.get(), sim_step, units, es , grid, schedule, value.wells, sumState, inteHD);
         ::Opm::RestartIO::writeSolution( rst_file.get(), value, write_double );
-        ::Opm::RestartIO::writeExtraData( rst_file.get(), value.extra );
+        //::Opm::RestartIO::writeExtraData( rst_file.get(), value.extra );
     }
 }
 
